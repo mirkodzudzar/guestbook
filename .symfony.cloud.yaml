@@ -1,6 +1,7 @@
 name: app
 
-type: php:7.3
+# type: php:7.3
+type: php:7.2
 
 runtime:
     extensions:
@@ -9,7 +10,7 @@ runtime:
         - sodium
         - ctype
         - iconv
-        
+
 
 build:
     flavor: none
@@ -31,4 +32,3 @@ hooks:
         set -x -e
 
         curl -s https://get.symfony.com/cloud/configurator | (>&2 bash)
-        
