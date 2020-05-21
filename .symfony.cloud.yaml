@@ -5,6 +5,7 @@ type: php:7.2
 
 runtime:
     extensions:
+        - redis
         - apcu
         - mbstring
         - sodium
@@ -14,6 +15,10 @@ runtime:
 
 build:
     flavor: none
+
+relationships:
+    database: "db:postgresql"
+    redis: "rediscache:redis"
 
 web:
     locations:
