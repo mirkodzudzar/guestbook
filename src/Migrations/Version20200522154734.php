@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20200522134731 extends AbstractMigration
+final class Version20200522154734 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -22,9 +22,7 @@ final class Version20200522134731 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('ALTER TABLE comment ADD state VARCHAR(255)');
-        $this->addSql("UPDATE comment SET state='published'");
-        $this->addSql('ALTER TABLE comment ALTER COLUMN state SET NOT NULL');
+        $this->addSql('ALTER TABLE comment ALTER state SET DEFAULT \'submitted\'');
     }
 
     public function down(Schema $schema) : void
@@ -33,6 +31,6 @@ final class Version20200522134731 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
         $this->addSql('CREATE SCHEMA public');
-        $this->addSql('ALTER TABLE comment DROP state');
+        $this->addSql('ALTER TABLE comment ALTER state DROP DEFAULT');
     }
 }
