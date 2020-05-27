@@ -5,6 +5,7 @@ type: php:7.2
 
 runtime:
     extensions:
+        - xsl
         - amqp
         - redis
         - apcu
