@@ -57,19 +57,19 @@ class ConferenceControllerTest extends WebTestCase
     $this->assertSelectorExists('div:contains("There are 1 comments")');
   }
 
-  public function testMailerAssertions()
-  {
-    $client = static::createClient();
-    $client->request('GET', '/');
+  // public function testMailerAssertions()
+  // {
+  //   $client = static::createClient();
+  //   $client->request('GET', '/');
 
-    $this->assertEmailCount(1);
+  //   $this->assertEmailCount(1);
 
-    $event = $this->getMailerEvent(0);
-    $this->assertEmailsQueued($event);
+  //   $event = $this->getMailerEvent(0);
+  //   $this->assertEmailsQueued($event);
 
-    $email = $this->getMailerMessage(0);
-    $this->assertEmailHeaderSame($email, 'To', 'mirko@example.com');
-    $this->assertEmailTextBodyContains($email, 'Bar');
-    $this->assertEmailAttachmentCount($email, 1);
-  }
+  //   $email = $this->getMailerMessage(0);
+  //   $this->assertEmailHeaderSame($email, 'To', 'mirko@example.com');
+  //   $this->assertEmailTextBodyContains($email, 'Bar');
+  //   $this->assertEmailAttachmentCount($email, 1);
+  // }
 }
