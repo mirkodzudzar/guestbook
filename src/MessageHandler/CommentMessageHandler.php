@@ -3,15 +3,16 @@
 namespace App\MessageHandler;
 
 use App\SpamChecker;
+use App\ImageOptimizer;
 use Psr\Log\LoggerInterface;
 use App\Message\CommentMessage;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\NotificationEmail;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Bridge\Twig\Mime\NotificationEmail;
 
 class CommentMessageHandler implements MessageHandlerInterface
 {
@@ -30,7 +31,9 @@ class CommentMessageHandler implements MessageHandlerInterface
                               MessageBusInterface $bus,
                               WorkflowInterface $commentStateMachine,
                               MailerInterface $mailer,
+                              ImageOptimizer $imageOptimizer,
                               string $adminEmail,
+                              string $photoDir,
                               LoggerInterface $logger = null)
   {
     $this->entityManager = $entityManager;
@@ -39,7 +42,9 @@ class CommentMessageHandler implements MessageHandlerInterface
     $this->bus = $bus;
     $this->commentStateMachine = $commentStateMachine;
     $this->mailer = $mailer;
+    $this->imageOptimizer = $this->imageOptimizer;
     $this->adminEmail = $adminEmail;
+    $this->photoDir = $photoDir;
     $this->logger = $logger;
   }
 
@@ -70,6 +75,12 @@ class CommentMessageHandler implements MessageHandlerInterface
         ->to($this->adminEmail)
         ->context(['comment' => $comment])
       );
+    } elseif ($this->workflow->can($comment, 'optimize')) {
+      if ($comment->getPhotoFilename()) {
+        $this->imageOptimizer->resize($this->photoDir . '/' . $comment->getPhotoFilename());
+      }
+      $this->workflow->apply($comment, 'optimize');
+      $this->entityManager->flush();
     } elseif ($this->logger) {
       $this->logger->debug('Dropping comment message', ['comment' => $comment->getId(), 'state' => $comment->getState()]);
     }
