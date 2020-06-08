@@ -9,7 +9,9 @@ use App\Message\CommentMessage;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use App\Notification\CommentReviewNotification;
 use Symfony\Bridge\Twig\Mime\NotificationEmail;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -21,8 +23,7 @@ class CommentMessageHandler implements MessageHandlerInterface
   private $commentRepository;
   private $bus;
   private $workflow;
-  private $mailer;
-  private $adminEmail;
+  private $notifier;
   private $logger;
 
   public function __construct(EntityManagerInterface $entityManager,
@@ -30,9 +31,8 @@ class CommentMessageHandler implements MessageHandlerInterface
                               CommentRepository $commentRepository,
                               MessageBusInterface $bus,
                               WorkflowInterface $commentStateMachine,
-                              MailerInterface $mailer,
+                              NotifierInterface $notifier,
                               ImageOptimizer $imageOptimizer,
-                              string $adminEmail,
                               string $photoDir,
                               LoggerInterface $logger = null)
   {
@@ -41,9 +41,8 @@ class CommentMessageHandler implements MessageHandlerInterface
     $this->commentRepository = $commentRepository;
     $this->bus = $bus;
     $this->commentStateMachine = $commentStateMachine;
-    $this->mailer = $mailer;
+    $this->notifier = $notifier;
     $this->imageOptimizer = $this->imageOptimizer;
-    $this->adminEmail = $adminEmail;
     $this->photoDir = $photoDir;
     $this->logger = $logger;
   }
@@ -68,13 +67,8 @@ class CommentMessageHandler implements MessageHandlerInterface
       $this->entityManager->flush();
       $this->bus->dispatch($message);
     } elseif ($this->workflow->can($comment, 'publish') || $this->workflow->can($comment, 'publish_ham')) {
-      $this->mailer->send((new NotificationEmail())
-        ->subject('New comment posted')
-        ->htmlTemplate('emails/comment_notification.html.twig')
-        ->from($this->adminEmail)
-        ->to($this->adminEmail)
-        ->context(['comment' => $comment])
-      );
+      $notification = new CommentReviewNotification($comment, $message->getReviewUrl());
+      $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
     } elseif ($this->workflow->can($comment, 'optimize')) {
       if ($comment->getPhotoFilename()) {
         $this->imageOptimizer->resize($this->photoDir . '/' . $comment->getPhotoFilename());
