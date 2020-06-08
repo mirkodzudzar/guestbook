@@ -5,6 +5,7 @@
         "php": "^7.2.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "api-platform/api-pack": "^1.2",
         "easycorp/easyadmin-bundle": "^2.3",
         "imagine/imagine": "^1.2",
         "sensio/framework-extra-bundle": "^5.5",
@@ -29,7 +30,8 @@
         "symfony/yaml": "5.0.*",
         "twig/cssinliner-extra": "^3.0",
         "twig/inky-extra": "^3.0",
-        "twig/intl-extra": "^3.0"
+        "twig/intl-extra": "^3.0",
+        "webonyx/graphql-php": "^0.13.8"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^6.3",
