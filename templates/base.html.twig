@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
@@ -11,7 +12,14 @@
         {{ render_esi(path('conference_header')) }}
         <hr>
     </header>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        <div class="container">
+            {% block body %}{% endblock %}
+             <script
+                src="https://code.jquery.com/jquery-2.2.4.min.js"
+                integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+                crossorigin="anonymous"></script>
+            <script src="{{ asset('js/app.js') }}"></script>
+            {% block javascripts %}{% endblock %}
+        </div>
     </body>
 </html>
